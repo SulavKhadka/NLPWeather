@@ -1,4 +1,3 @@
-import urllib2
 """Generate a weather-report based on the user's location.
 
 The script uses GeoIP to determine the user's location based on the IP and
@@ -8,6 +7,7 @@ retrieves the weather, which is then returned it in a english sentence.
 # Native libraries/modules
 import json
 import sys
+import urllib2
 
 # External libraries/modules
 import user_loc
