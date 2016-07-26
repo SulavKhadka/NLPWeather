@@ -12,7 +12,7 @@ wunderground.com api key: https://www.wunderground.com/weather/api/
 ## Usage
 
 
-**Commad line:**
+**Command line:**
 ```
 python Weather.py fullReport
 python Weather.py shortReport
