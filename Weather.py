@@ -24,7 +24,9 @@ def weather_info(API_KEY):
     tz = currloc['time_zone']
 
     try:
-        f = urllib2.urlopen('http://api.wunderground.com/api/%s/geolookup/conditions/q/%s/%s.json' % (API_KEY, state, city))
+        data = urllib2.urlopen(
+            'http://api.wunderground.com/api/{}/geolookup/conditions'
+            '/q/{}/{}.json'.format(api_key, state, city))
     except urllib2.URLError:
         print "Please check to your internet connection"
         exit()
@@ -61,7 +63,9 @@ def weather_info(API_KEY):
     else:
         precip = "It is supposed to rain " + precip + " inches today."
 
-    weather_data_lst = [weather, location, str(temp_f), humidity, winddir, str(int(windspeed)), feelslike, visible_condition, visibility, precip, tz]
+    weather_data_lst = [weather, location, str(temp_f), humidity, winddir,
+                        str(int(windspeed)), feelslike, visible_condition,
+                        visibility, precip, tme_zone]
 
     return weather_data_lst
 
@@ -75,10 +79,22 @@ def full_summary(weather_lst):
     :return: string
     """
     if weather_lst[2] == weather_lst[6]:
-        report = "It is " + weather_lst[0] + " and " + weather_lst[2] + " degrees right now in " + weather_lst[1] + " with winds of " + weather_lst[5] + " miles per hour. Visibility is " + weather_lst[7] + " with the range of " + weather_lst[8] + " miles. " + weather_lst[9]
+        report = ("It is {cnd} and {deg} degrees right now in {loc} with winds"
+                  " of {wnd} miles per hour. Visibility is {vis} with the "
+                  "range of {rng} miles. {pre}".format(
+                      cnd=weather_lst[0], deg=weather_lst[2],
+                      loc=weather_lst[1], wnd=weather_lst[5],
+                      vis=weather_lst[7], rng=weather_lst[8],
+                      pre=weather_lst[9]))
     else:
-        report = "It is " + weather_lst[0] + " and " + weather_lst[2] + " degrees right now in " + weather_lst[1] + " with winds of " + weather_lst[5] + " miles per hour. So it feels like " + weather_lst[6] + " degrees outside. Visibility is " + weather_lst[7] + " with the range of " + weather_lst[8] + " miles. " + weather_lst[9]
-
+        report = ("It is {cnd} and {deg} degrees right now in {loc} with winds"
+                  "of {wnd} miles per hour. So it feels like {flk} degrees "
+                  "outside. Visibility is {vis} with the range of {rng} miles."
+                  " {pre}".format(
+                      cnd=weather_lst[0], deg=weather_lst[2],
+                      loc=weather_lst[1], wnd=weather_lst[5],
+                      flk=weather_lst[6], vis=weather_lst[7],
+                      rng=weather_lst[8], pre=weather_lst[9]))
     return report
 
 
@@ -89,7 +105,10 @@ def short_summary(weather_lst):
     :return: string
     """
     if weather_lst[2] == weather_lst[6]:
-        report = "It is " + weather_lst[0] + " and " + weather_lst[2] + " degrees right now in " + weather_lst[1] + " with winds of " + weather_lst[5] + " miles per hour."
+        report = ("It is {cnd} and {deg} degrees right now in {loc} with winds"
+                  " of {wnd} miles per hour.".format(
+                      cnd=weather_lst[0], deg=weather_lst[2],
+                      loc=weather_lst[1], wnd=weather_lst[5]))
     return report
 
 
@@ -111,6 +130,7 @@ def report(reqData, API_KEY):
 if __name__ == '__main__':
     API_KEY = raw_input("Please enter your wunderground api key:")
     if len(sys.argv) != 2:
-        print "%d of 2 Argument(s) found. Please enter 'fullReport' or  'shortReport' as argument." % len(sys.argv)
+        print("{} of 2 Argument(s) found. Please enter 'fullReport' or "
+              "'shortReport' as argument.".format(sys.argv))
     else:
         print report(sys.argv[1], API_KEY)
