@@ -1,17 +1,23 @@
-"""Native libraries/modules"""
 import urllib2
+"""Generate a weather-report based on the user's location.
+
+The script uses GeoIP to determine the user's location based on the IP and
+retrieves the weather, which is then returned it in a english sentence.
+"""
+
+# Native libraries/modules
 import json
 import sys
 
-"""External libraries/modules"""
+# External libraries/modules
 import user_loc
 
 
 def weather_info(API_KEY):
-    """Retrieves Weather info from wunderground.com and parses the json and stores necessary items in a list
+    """Retrieve and parse Weather info from wunderground.com.
+
     :return: list
     """
-
     currloc = user_loc.loc()
     state = currloc['region_code']
     city = currloc['city']
@@ -61,13 +67,13 @@ def weather_info(API_KEY):
 
 
 def full_summary(weather_lst):
-    """Summary of the weather for the TTS(currently not implemented).
+    """Summarize the weather for the TTS (currently not implemented).
 
-    The if statement deletes the feels like sentence if the 'temperature' and the 'feels_like' variables are the same.
+    The if statement deletes the feels like sentence if the 'temperature' and
+    the 'feels_like' variables are the same.
     :param weather_lst
     :return: string
     """
-
     if weather_lst[2] == weather_lst[6]:
         report = "It is " + weather_lst[0] + " and " + weather_lst[2] + " degrees right now in " + weather_lst[1] + " with winds of " + weather_lst[5] + " miles per hour. Visibility is " + weather_lst[7] + " with the range of " + weather_lst[8] + " miles. " + weather_lst[9]
     else:
@@ -77,7 +83,7 @@ def full_summary(weather_lst):
 
 
 def short_summary(weather_lst):
-    """Short summary of the weather for the TTS(currently not implemented).
+    """Generate a short summary of the weather.
 
     :param weather_lst
     :return: string
@@ -88,8 +94,9 @@ def short_summary(weather_lst):
 
 
 def report(reqData, API_KEY):
-    """Receives the weather report based on the parameter
-    :param reqData:
+    """Generate the weather report based on the parameter.
+
+    :param report_length:
     :return: string
     """
     weather_data_lst = weather_info(API_KEY)
