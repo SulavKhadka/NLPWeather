@@ -7,7 +7,7 @@ import sys
 import user_loc
 
 
-def weather_info():
+def weather_info(API_KEY):
     """Retrieves Weather info from wunderground.com and parses the json and stores necessary items in a list
     :return: list
     """
@@ -18,7 +18,7 @@ def weather_info():
     tz = currloc['time_zone']
 
     try:
-        f = urllib2.urlopen('http://api.wunderground.com/api/91cbce82f4b29258/geolookup/conditions/q/%s/%s.json' % (state, city))
+        f = urllib2.urlopen('http://api.wunderground.com/api/%s/geolookup/conditions/q/%s/%s.json' % (API_KEY, state, city))
     except urllib2.URLError:
         print "Please check to your internet connection"
         exit()
@@ -26,7 +26,11 @@ def weather_info():
     parsed_json = json.loads(json_string)
     f.close()
 
-    location = parsed_json['location']['city']
+    try:
+        location = parsed_json['location']['city']
+    except KeyError:
+        print "Invalid API key. please try again."
+        exit()
     temp_f = parsed_json['current_observation']['temp_f']
     weather = parsed_json['current_observation']['weather']
     humidity = parsed_json['current_observation']['relative_humidity']
@@ -83,12 +87,12 @@ def short_summary(weather_lst):
     return report
 
 
-def report(reqData):
+def report(reqData, API_KEY):
     """Receives the weather report based on the parameter
     :param reqData:
     :return: string
     """
-    weather_data_lst = weather_info()
+    weather_data_lst = weather_info(API_KEY)
     if reqData == "fullReport":
         return full_summary(weather_data_lst)
     elif reqData == "shortReport":
@@ -98,7 +102,8 @@ def report(reqData):
 
 
 if __name__ == '__main__':
+    API_KEY = raw_input("Please enter your wunderground api key:")
     if len(sys.argv) != 2:
         print "%d of 2 Argument(s) found. Please enter 'fullReport' or  'shortReport' as argument." % len(sys.argv)
     else:
-        print report(sys.argv[1])
+        print report(sys.argv[1], API_KEY)
