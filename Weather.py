@@ -13,7 +13,7 @@ import urllib2
 import user_loc
 
 
-def weather_info(API_KEY):
+def weather_info(api_key):
     """Retrieve and parse Weather info from wunderground.com.
 
     :return: list
@@ -21,7 +21,7 @@ def weather_info(API_KEY):
     currloc = user_loc.loc()
     state = currloc['region_code']
     city = currloc['city']
-    tz = currloc['time_zone']
+    tme_zone = currloc['time_zone']
 
     try:
         data = urllib2.urlopen(
@@ -30,9 +30,9 @@ def weather_info(API_KEY):
     except urllib2.URLError:
         print "Please check to your internet connection"
         exit()
-    json_string = f.read()
+    json_string = data.read()
     parsed_json = json.loads(json_string)
-    f.close()
+    data.close()
 
     try:
         location = parsed_json['location']['city']
@@ -112,16 +112,16 @@ def short_summary(weather_lst):
     return report
 
 
-def report(reqData, API_KEY):
+def generate_report(report_length, api_key):
     """Generate the weather report based on the parameter.
 
     :param report_length:
     :return: string
     """
-    weather_data_lst = weather_info(API_KEY)
-    if reqData == "fullReport":
+    weather_data_lst = weather_info(api_key)
+    if report_length == "fullReport":
         return full_summary(weather_data_lst)
-    elif reqData == "shortReport":
+    elif report_length == "shortReport":
         return short_summary(weather_data_lst)
     else:
         return "Invalid Argument"
@@ -133,4 +133,4 @@ if __name__ == '__main__':
         print("{} of 2 Argument(s) found. Please enter 'fullReport' or "
               "'shortReport' as argument.".format(sys.argv))
     else:
-        print report(sys.argv[1], API_KEY)
+        print generate_report(sys.argv[1], API_KEY)
