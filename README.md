@@ -20,6 +20,6 @@ python Weather.py shortReport
 **Code Integration:**
 ```
 import Weather
-print Weather.generate_report("fullReport", API_KEY) #Gets full weather report
-print Weather.generate_report("shortReport", API_KEY) #Gets basic weather report
+print Weather.generate_report("fullReport", "INSERT_API_KEY") #Gets full weather report
+print Weather.generate_report("shortReport", "INSERT_API_KEY") #Gets basic weather report
 ```
