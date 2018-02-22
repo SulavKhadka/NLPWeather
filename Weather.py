@@ -140,9 +140,12 @@ def generate_report(report_length):
     :param report_length:
     :return: string
     """
-
-    keys = api_auth_keys.get_auth_keys("wunderground_api", "sk_chester")
-    weather_data_lst = weather_info(keys['client_id'])
+    try:
+        client_id = api_auth_keys.get_auth_keys("wunderground_api", "sk_chester")['client_id']
+    except:
+        cleint_id = input("Enter wunderground API key: ")
+    
+    weather_data_lst = weather_info(client_id)
     if report_length == "fullReport":
         return full_summary(weather_data_lst)
     elif report_length == "shortReport":
