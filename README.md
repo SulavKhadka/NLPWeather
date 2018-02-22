@@ -6,7 +6,6 @@ This script is a part of a bigger project I have called CHESTER. Currently I am 
 
 ## Requirements
 
-
 wunderground.com api key: https://www.wunderground.com/weather/api/
   
 ## Usage
@@ -20,6 +19,6 @@ python Weather.py shortReport
 **Code Integration:**
 ```
 import Weather
-print Weather.generate_report("fullReport", "INSERT_API_KEY") #Gets full weather report
-print Weather.generate_report("shortReport", "INSERT_API_KEY") #Gets basic weather report
+print Weather.generate_report("fullReport") #Gets full weather report
+print Weather.generate_report("shortReport") #Gets basic weather report
 ```
