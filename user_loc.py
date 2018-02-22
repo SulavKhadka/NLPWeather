@@ -1,4 +1,4 @@
-import urllib2
+import requests
 import json
 
 
@@ -7,11 +7,15 @@ def loc():
     :return: json string
     """
     try:
-        f = urllib2.urlopen('http://freegeoip.net/json/')
-    except urllib2.URLError:
-        print "Please check to your internet connection"
+        f = requests.get('http://freegeoip.net/json/')
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.SSLError,
+            requests.exceptions.Timeout) as e:
+
+        print("Could not get IP. Error message: \n{}".format(e))
         exit()
-    json_string = f.read()
+
+    json_string = f.text
     f.close()
     location = json.loads(json_string)
 

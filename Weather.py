@@ -7,10 +7,29 @@ retrieves the weather, which is then returned it in a english sentence.
 # Native libraries/modules
 import json
 import sys
-import urllib2
+import requests
 
 # External libraries/modules
-import user_loc
+from user_loc import loc
+import api_auth_keys
+
+
+def get_user_location():
+
+    try:
+        with open("../user_info.json") as file:
+            currloc = json.loads(file.read())["locations"]["home"]
+        state = currloc['state_short']
+        city = currloc['city']
+        tme_zone = currloc['time_zone']
+    except FileNotFoundError:
+        print("Didn't find user_info file switching to geoIP.")
+        currloc = loc()
+        state = currloc['region_code']
+        city = currloc['city']
+        tme_zone = currloc['time_zone']
+
+    return [state, city, tme_zone]
 
 
 def weather_info(api_key):
@@ -18,26 +37,29 @@ def weather_info(api_key):
 
     :return: list
     """
-    currloc = user_loc.loc()
-    state = currloc['region_code']
-    city = currloc['city']
-    tme_zone = currloc['time_zone']
-
+    currloc = get_user_location()
+    state = currloc[0]
+    city = currloc[1]
+    tme_zone = currloc[2]
     try:
-        data = urllib2.urlopen(
+        data = requests.get(
             'http://api.wunderground.com/api/{}/geolookup/conditions'
             '/q/{}/{}.json'.format(api_key, state, city))
-    except urllib2.URLError:
-        print "Please check to your internet connection"
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.SSLError,
+            requests.exceptions.Timeout) as e:
+
+        print("Could not get IP. Error message: \n{}".format(e))
         exit()
-    json_string = data.read()
+
+    json_string = data.text
     parsed_json = json.loads(json_string)
     data.close()
 
     try:
         location = parsed_json['location']['city']
     except KeyError:
-        print "Invalid API key. please try again."
+        print("Invalid API key. please try again.")
         exit()
     temp_f = parsed_json['current_observation']['temp_f']
     weather = parsed_json['current_observation']['weather']
@@ -88,7 +110,7 @@ def full_summary(weather_lst):
                       pre=weather_lst[9]))
     else:
         report = ("It is {cnd} and {deg} degrees right now in {loc} with winds"
-                  "of {wnd} miles per hour. So it feels like {flk} degrees "
+                  " of {wnd} miles per hour. So it feels like {flk} degrees "
                   "outside. Visibility is {vis} with the range of {rng} miles."
                   " {pre}".format(
                       cnd=weather_lst[0], deg=weather_lst[2],
@@ -112,13 +134,15 @@ def short_summary(weather_lst):
     return report
 
 
-def generate_report(report_length, api_key):
+def generate_report(report_length):
     """Generate the weather report based on the parameter.
 
     :param report_length:
     :return: string
     """
-    weather_data_lst = weather_info(api_key)
+
+    keys = api_auth_keys.get_auth_keys("wunderground_api", "sk_chester")
+    weather_data_lst = weather_info(keys['client_id'])
     if report_length == "fullReport":
         return full_summary(weather_data_lst)
     elif report_length == "shortReport":
@@ -128,9 +152,8 @@ def generate_report(report_length, api_key):
 
 
 if __name__ == '__main__':
-    API_KEY = raw_input("Please enter your wunderground api key:")
     if len(sys.argv) != 2:
         print("{} of 2 Argument(s) found. Please enter 'fullReport' or "
               "'shortReport' as argument.".format(sys.argv))
     else:
-        print generate_report(sys.argv[1], API_KEY)
+        print(generate_report(sys.argv[1]))
