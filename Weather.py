@@ -143,7 +143,7 @@ def generate_report(report_length):
     try:
         client_id = api_auth_keys.get_auth_keys("wunderground_api", "sk_chester")['client_id']
     except:
-        cleint_id = input("Enter wunderground API key: ")
+        client_id = input("Enter wunderground API key: ")
     
     weather_data_lst = weather_info(client_id)
     if report_length == "fullReport":
